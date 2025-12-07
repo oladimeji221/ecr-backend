@@ -1,0 +1,258 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "My API Backend",
+        "description": "API for the backend of my application.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost/api",
+            "description": "Local development server"
+        }
+    ],
+    "paths": {
+        "/register": {
+            "post": {
+                "tags": ["Auth"],
+                "summary": "Register a new user",
+                "requestBody": { "$ref": "#/components/requestBodies/RegisterUser" },
+                "responses": {
+                    "201": { "$ref": "#/components/responses/AuthSuccess" },
+                    "422": { "$ref": "#/components/responses/ValidationError" }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "tags": ["Auth"],
+                "summary": "Login a user",
+                "requestBody": { "$ref": "#/components/requestBodies/LoginUser" },
+                "responses": {
+                    "200": { "$ref": "#/components/responses/AuthSuccess" },
+                    "422": { "description": "Invalid credentials." }
+                }
+            }
+        },
+        "/logout": {
+            "post": {
+                "tags": ["Auth"],
+                "summary": "Logout a user",
+                "security": [{"BearerAuth": []}],
+                "responses": {
+                    "200": { "description": "Logged out successfully." }
+                }
+            }
+        },
+        "/upload-image": {
+            "post": {
+                "tags": ["Images"],
+                "summary": "Upload an image",
+                "security": [{"BearerAuth": []}],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "image": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Image uploaded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "url": {
+                                            "type": "string",
+                                            "format": "url"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": { "$ref": "#/components/responses/ValidationError" }
+                }
+            }
+        },
+        "/user": {
+            "get": {
+                "tags": ["Users"],
+                "summary": "Get authenticated user's profile",
+                "security": [{"BearerAuth": []}],
+                "responses": {
+                    "200": {
+                        "description": "User profile.",
+                        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } }
+                    }
+                }
+            },
+            "put": {
+                "tags": ["Users"],
+                "summary": "Update authenticated user's profile",
+                "security": [{"BearerAuth": []}],
+                "requestBody": { "$ref": "#/components/requestBodies/UpdateUser" },
+                "responses": {
+                    "200": { "description": "User profile updated.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } } },
+                    "422": { "$ref": "#/components/responses/ValidationError" }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "tags": ["Users"],
+                "summary": "Get all users (Admin)",
+                "security": [{"BearerAuth": []}],
+                "responses": {
+                    "200": {
+                        "description": "A list of users.",
+                        "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/User" } } } }
+                    }
+                }
+            }
+        },
+        "/my/blogs": {
+            "get": {
+                "tags": ["Blogs"],
+                "summary": "Get my blogs",
+                "security": [{"BearerAuth": []}],
+                "responses": {
+                    "200": {
+                        "description": "A list of the authenticated user's blogs.",
+                        "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Blog" } } } }
+                    }
+                }
+            }
+        },
+        "/categories": {
+            "get": {
+                "tags": ["Categories"],
+                "summary": "List all categories",
+                "responses": { "200": { "description": "List of categories.", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Category" } } } } } }
+            },
+            "post": {
+                "tags": ["Categories"],
+                "summary": "Create a new category (Admin)",
+                "security": [{"BearerAuth": []}],
+                "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "name": { "type": "string" } } } } } },
+                "responses": { "201": { "description": "Category created.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Category" } } } } }
+            }
+        },
+        "/categories/{category}": {
+            "parameters": [ { "name": "category", "in": "path", "required": true, "schema": { "type": "integer" } } ],
+            "get": { "tags": ["Categories"], "summary": "Get a specific category", "responses": { "200": { "description": "Category details.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Category" } } } } } },
+            "put": {
+                "tags": ["Categories"],
+                "summary": "Update a category (Admin)",
+                "security": [{"BearerAuth": []}],
+                "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "name": { "type": "string" } } } } } },
+                "responses": { "200": { "description": "Category updated.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Category" } } } } }
+            },
+            "delete": { "tags": ["Categories"], "summary": "Delete a category (Admin)", "security": [{"BearerAuth": []}], "responses": { "204": { "description": "Category deleted." } } }
+        },
+        "/blogs": {
+            "get": { "tags": ["Blogs"], "summary": "List all published blogs", "responses": { "200": { "description": "List of published blogs.", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Blog" } } } } } } },
+            "post": {
+                "tags": ["Blogs"],
+                "summary": "Create a new blog",
+                "security": [{"BearerAuth": []}],
+                "requestBody": { "required": true, "content": { "multipart/form-data": { "schema": { "$ref": "#/components/schemas/NewBlog" } } } },
+                "responses": { "201": { "description": "Blog created.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Blog" } } } } }
+            }
+        },
+        "/blogs/{slug}": {
+            "parameters": [ { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } } ],
+            "get": { "tags": ["Blogs"], "summary": "Get a specific blog", "responses": { "200": { "description": "Blog details.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Blog" } } } } } },
+            "post": {
+                "tags": ["Blogs"],
+                "summary": "Update a blog",
+                "security": [{"BearerAuth": []}],
+                 "requestBody": { "required": true, "content": { "multipart/form-data": { "schema": { "$ref": "#/components/schemas/NewBlog" } } } },
+                "responses": { "200": { "description": "Blog updated.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Blog" } } } } }
+            },
+            "delete": { "tags": ["Blogs"], "summary": "Delete a blog", "security": [{"BearerAuth": []}], "responses": { "204": { "description": "Blog deleted." } } }
+        },
+        "/blogs/{slug}/comments": {
+            "parameters": [ { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } } ],
+            "get": { "tags": ["Comments"], "summary": "List comments for a blog", "responses": { "200": { "description": "List of comments.", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Comment" } } } } } } },
+            "post": {
+                "tags": ["Comments"],
+                "summary": "Create a new comment",
+                "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "content": {"type": "string"}, "name": {"type": "string"}, "email": {"type": "string", "format": "email"} } } } } },
+                "responses": { "201": { "description": "Comment created.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Comment" } } } } }
+            }
+        },
+        "/comments/{comment}": {
+             "parameters": [ { "name": "comment", "in": "path", "required": true, "schema": { "type": "integer" } } ],
+             "get": { "tags": ["Comments"], "summary": "Get a specific comment", "responses": { "200": { "description": "Comment details.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Comment" } } } } } },
+             "put": {
+                "tags": ["Comments"],
+                "summary": "Update a comment",
+                "security": [{"BearerAuth": []}],
+                "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "content": { "type": "string" } } } } } },
+                "responses": { "200": { "description": "Comment updated.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Comment" } } } } }
+             },
+            "delete": { "tags": ["Comments"], "summary": "Delete a comment", "security": [{"BearerAuth": []}], "responses": { "204": { "description": "Comment deleted." } } }
+        },
+        "/blogs/{blog}/likes": {
+            "parameters": [ { "name": "blog", "in": "path", "required": true, "schema": { "type": "integer" } } ],
+            "post": {
+                "tags": ["Likes"],
+                "summary": "Like a blog",
+                "security": [{"BearerAuth": []}],
+                "responses": { "201": { "description": "Blog liked.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Like" } } } } }
+            },
+            "delete": { "tags": ["Likes"], "summary": "Unlike a blog", "security": [{"BearerAuth": []}], "responses": { "204": { "description": "Blog unliked." } } }
+        },
+        "/contact": {
+            "post": {
+                "tags": ["Forms"],
+                "summary": "Submit contact form",
+                "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "name": {"type": "string"}, "email": {"type": "string"}, "message": {"type": "string"} } } } } },
+                "responses": { "200": { "description": "Message sent." } }
+            }
+        },
+        "/quote": {
+            "post": {
+                "tags": ["Forms"],
+                "summary": "Submit quote form",
+                "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "name": {"type": "string"}, "email": {"type": "string"}, "service": {"type": "string"}, "message": {"type": "string"} } } } } },
+                "responses": { "200": { "description": "Quote request sent." } }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "User": { "type": "object", "properties": { "id": { "type": "integer"}, "name": { "type": "string"}, "first_name": { "type": "string"}, "middle_name": { "type": "string", "nullable": true }, "surname": { "type": "string"}, "email": { "type": "string", "format": "email"}, "phone_number": { "type": "string"}, "department": { "type": "string"}, "position": { "type": "string"}, "role": { "type": "string"} } },
+            "Category": { "type": "object", "properties": { "id": { "type": "integer"}, "name": { "type": "string"}, "slug": { "type": "string"} } },
+            "Blog": { "type": "object", "properties": { "id": { "type": "integer"}, "title": { "type": "string"}, "slug": { "type": "string"}, "content": { "type": "string"}, "image": { "type": "string"}, "meta_title": { "type": "string"}, "meta_description": { "type": "string"}, "meta_keywords": { "type": "string"}, "category_id": { "type": "integer"}, "user_id": { "type": "integer"}, "status": {"type": "string", "enum": ["published", "draft"]}, "canonical_url": {"type": "string"}, "custom_url": {"type": "string"}, "json_ld": {"type": "string"}, "og_title": {"type": "string"}, "og_description": {"type": "string"}, "og_image": {"type": "string"}, "view_count": {"type": "integer"} } },
+            "NewBlog": { "type": "object", "properties": { "title": { "type": "string" }, "content": { "type": "string" }, "image": { "type": "string", "format": "binary" }, "category_id": { "type": "integer" }, "status": {"type": "string", "enum": ["published", "draft"]}, "canonical_url": {"type": "string"}, "custom_url": {"type": "string"}, "json_ld": {"type": "string"}, "og_title": {"type": "string"}, "og_description": {"type": "string"}, "og_image": {"type": "string", "format": "binary"} } },
+            "Comment": { "type": "object", "properties": { "id": { "type": "integer"}, "blog_id": { "type": "integer"}, "user_id": { "type": "integer", "nullable": true}, "name": { "type": "string"}, "email": { "type": "string", "format": "email"}, "content": { "type": "string"}, "approved": { "type": "boolean"} } },
+            "Like": { "type": "object", "properties": { "id": { "type": "integer"}, "blog_id": { "type": "integer"}, "user_id": { "type": "integer"} } },
+            "ValidationError": { "type": "object", "properties": { "message": { "type": "string"}, "errors": { "type": "object"} } }
+        },
+        "requestBodies": {
+            "RegisterUser": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "first_name": { "type": "string"}, "surname": { "type": "string"}, "email": { "type": "string", "format": "email"}, "phone_number": { "type": "string"}, "department": { "type": "string"}, "password": { "type": "string"}, "password_confirmation": { "type": "string"} } } } } },
+            "LoginUser": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "email": { "type": "string", "format": "email"}, "password": { "type": "string"} } } } } },
+            "UpdateUser": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "first_name": { "type": "string"}, "surname": { "type": "string"}, "email": { "type": "string", "format": "email"}, "phone_number": { "type": "string"}, "department": { "type": "string"}, "position": { "type": "string"} } } } } }
+        },
+        "responses": {
+            "AuthSuccess": { "description": "Authentication successful.", "content": { "application/json": { "schema": { "type": "object", "properties": { "token": { "type": "string" }, "user": { "$ref": "#/components/schemas/User" } } } } } },
+            "ValidationError": { "description": "Validation error.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ValidationError" } } } }
+        },
+        "securitySchemes": {
+            "BearerAuth": { "type": "http", "scheme": "bearer" }
+        }
+    }
+}
