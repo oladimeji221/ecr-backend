@@ -6,7 +6,11 @@ use Illuminate\Http\Request;
 
 // Handle CORS before Laravel boots (cPanel/shared hosting fix)
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-$allowedOrigins = ['https://ecr-ts.com', 'https://www.ecr-ts.com'];
+$allowedOrigins = [
+    'https://ecr-ts.com',
+    'https://www.ecr-ts.com',
+    'https://ecr-frontend-eight.vercel.app',
+];
 
 if (in_array($origin, $allowedOrigins)) {
     header("Access-Control-Allow-Origin: $origin");
