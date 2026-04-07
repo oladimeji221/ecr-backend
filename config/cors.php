@@ -20,11 +20,14 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
+        'https://ecr-ts.com',
+        'https://www.ecr-ts.com',
         'https://ecr-frontend-eight.vercel.app', // Frontend URL without trailing slash
         'https://ecr-frontend-eight.vercel.app/', // Frontend URL with trailing slash
         // You can keep other allowed origins here if needed, e.g., for local development
         'http://localhost:3000',
         'http://localhost',
+        'http://localhost:5173',
     ],
 
     'allowed_origins_patterns' => [],

@@ -12,12 +12,15 @@ use App\Http\Controllers\Api\AppointmentFormController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ImageUploadController;
 use App\Http\Controllers\Api\SearchController;
+use App\Http\Controllers\Api\GuestAuthController;
 use App\Http\Controllers\NewsletterSubscriptionController;
 use App\Http\Controllers\CategorySubscriptionController; // Import the new controller
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::post('register', [AuthController::class, 'register']);
+Route::post('guests/register', [GuestAuthController::class, 'register']);
+Route::post('guests/login', [GuestAuthController::class, 'login']);
 Route::post('login', [AuthController::class, 'login']);
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 

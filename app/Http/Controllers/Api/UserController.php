@@ -26,6 +26,7 @@ class UserController extends Controller
             'phone_number' => ['sometimes', 'required', 'string', 'max:20'],
             'department' => ['sometimes', 'required', 'string', 'max:255'],
             'position' => ['sometimes', 'required', 'string', 'max:255'],
+            'employment_type' => ['sometimes', 'required', 'string', 'max:255'],
             'profile_photo_path' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
             'bio' => ['nullable', 'string'],
         ]);
@@ -72,7 +73,8 @@ class UserController extends Controller
             'phone_number' => ['required', 'string', 'max:20'],
             'department' => ['required', 'string', 'max:255'],
             'position' => ['nullable', 'string', 'max:255'],
-            'role' => ['required', 'string', 'in:user,admin'],
+            'role' => ['required', 'string', 'max:255'],
+            'employment_type' => ['required', 'string', 'max:255'],
             'profile_photo_path' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
             'bio' => ['nullable', 'string'],
         ]);

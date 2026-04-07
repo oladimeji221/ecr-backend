@@ -26,6 +26,8 @@ class CreateNewUser implements CreatesNewUsers
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'phone_number' => ['required', 'string', 'max:20'],
             'department' => ['required', 'string', 'max:255'],
+            'position' => ['required', 'string', 'max:255'],
+            'employment_type' => ['required', 'string', 'max:255'],
             'password' => $this->passwordRules(),
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
         ])->validate();
@@ -37,11 +39,18 @@ class CreateNewUser implements CreatesNewUsers
             'email' => $input['email'],
             'phone_number' => $input['phone_number'],
             'department' => $input['department'],
-            'role' => 'user', // Default role
+            'position' => $input['position'],
+            'role' => 'user',
+            'employment_type' => $input['employment_type'],
             'password' => Hash::make($input['password']),
         ]);
 
-        Mail::mailer('noreply')->to($user->email)->send(new UserWelcomeMail($user));
+        try {
+            Mail::mailer('noreply')->to($user->email)->send(new UserWelcomeMail($user));
+        } catch (\Exception $e) {
+            // Log the error but continue registration
+            logger()->error('Failed to send welcome email: ' . $e->getMessage());
+        }
 
         return $user;
     }

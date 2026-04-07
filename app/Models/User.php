@@ -40,6 +40,7 @@ class User extends Authenticatable
         'password',
         'profile_photo_path',
         'bio',
+        'employment_type',
     ];
 
     /**
